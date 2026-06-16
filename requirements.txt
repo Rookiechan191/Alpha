@@ -5,7 +5,7 @@ sentence-transformers
 faiss-cpu
 numpy
 tiktoken
-anthropic
+groq
 python-dotenv
 tqdm
 tabulate

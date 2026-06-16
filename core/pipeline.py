@@ -34,14 +34,15 @@ import json
 import os
 import time
 
-from anthropic import Anthropic
+from groq import Groq
 
-LLM_MODEL = os.environ.get("LLM_MODEL", "claude-haiku-4-5-20251001")
+# llama-3.3-70b-versatile: capable, fast on Groq, well under $0.02/query
+LLM_MODEL = os.environ.get("LLM_MODEL", "llama-3.3-70b-versatile")
 
-# Approximate per-token pricing for Claude Haiku (USD per token).
-# Update these if you change LLM_MODEL / pricing changes.
-PRICE_PER_INPUT_TOKEN = float(os.environ.get("PRICE_PER_INPUT_TOKEN", 1.0 / 1_000_000))
-PRICE_PER_OUTPUT_TOKEN = float(os.environ.get("PRICE_PER_OUTPUT_TOKEN", 5.0 / 1_000_000))
+# Groq pricing for llama-3.3-70b-versatile (USD per token)
+# Input: $0.59/M tokens, Output: $0.79/M tokens
+PRICE_PER_INPUT_TOKEN = float(os.environ.get("PRICE_PER_INPUT_TOKEN", 0.59 / 1_000_000))
+PRICE_PER_OUTPUT_TOKEN = float(os.environ.get("PRICE_PER_OUTPUT_TOKEN", 0.79 / 1_000_000))
 
 SYSTEM_PROMPT = """You are TruthGate, a question-answering assistant over the official \
 Kubernetes documentation. You will be given a user question and several retrieved \
@@ -73,8 +74,7 @@ Respond with ONLY a JSON object, no other text, in this exact format:
   "verdict": "answerable" | "unanswerable" | "false_premise",
   "answer": "<your answer, or explanation for false_premise/unanswerable>",
   "citations": ["<heading_path>", ...]
-}
-"""
+}"""
 
 
 def build_context(chunks):
@@ -89,7 +89,7 @@ def build_context(chunks):
 class TruthGate:
     def __init__(self, retriever):
         self.retriever = retriever
-        self.client = Anthropic()  # reads ANTHROPIC_API_KEY from env
+        self.client = Groq()  # reads GROQ_API_KEY from env
 
     def answer(self, question: str) -> dict:
         t0 = time.time()
@@ -112,17 +112,18 @@ class TruthGate:
         user_msg = f"Question: {question}\n\nRetrieved excerpts:\n\n{context}"
 
         t1 = time.time()
-        response = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=LLM_MODEL,
             max_tokens=500,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_msg}],
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_msg},
+            ],
+            response_format={"type": "json_object"},  # force valid JSON output
         )
         llm_time = time.time() - t1
 
-        raw_text = "".join(
-            block.text for block in response.content if block.type == "text"
-        )
+        raw_text = response.choices[0].message.content or ""
 
         try:
             cleaned = raw_text.strip()
@@ -139,8 +140,8 @@ class TruthGate:
             answer = f"[PARSE ERROR] raw model output: {raw_text[:300]}"
             citations = []
 
-        input_tokens = response.usage.input_tokens
-        output_tokens = response.usage.output_tokens
+        input_tokens = response.usage.prompt_tokens
+        output_tokens = response.usage.completion_tokens
         cost = input_tokens * PRICE_PER_INPUT_TOKEN + output_tokens * PRICE_PER_OUTPUT_TOKEN
 
         return {

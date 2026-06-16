@@ -1,0 +1,22 @@
+# Environment
+.env
+
+# Corpus, index, and generated data (rebuild via make ingest)
+data/raw/
+data/index/
+data/chunks.jsonl
+
+# Eval outputs (generated at runtime)
+eval/results.json
+eval/metrics.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.egg
+
+# Sentence-transformers model cache
+.cache/

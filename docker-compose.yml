@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  truthgate:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    command: ["python", "main.py", "--interactive"]

@@ -1,0 +1,11 @@
+requests
+beautifulsoup4
+markdown-it-py
+sentence-transformers
+faiss-cpu
+numpy
+tiktoken
+anthropic
+python-dotenv
+tqdm
+tabulate

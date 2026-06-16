@@ -6,9 +6,9 @@ data/raw/
 data/index/
 data/chunks.jsonl
 
-# Eval outputs (generated at runtime)
+# Eval outputs (per-question results are large, regenerate with make eval)
 eval/results.json
-eval/metrics.json
+# metrics.json is committed so reviewers can see numbers without running eval
 
 # Python
 __pycache__/

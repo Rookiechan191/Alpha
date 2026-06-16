@@ -1,0 +1,13 @@
+{
+  "unanswerable_recall": 0.75,
+  "unanswerable_precision": 0.8333,
+  "false_premise_detection_rate": 0.7,
+  "answerable_verdict_rate": 0.84,
+  "citation_match_rate": 0.7619,
+  "citation_match_n": 21,
+  "mean_cost_usd": 0.00091,
+  "p95_latency_s": 4.87,
+  "mean_latency_s": 2.63,
+  "adversarial_errors": 0,
+  "adversarial_total": 5
+}

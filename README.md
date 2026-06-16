@@ -56,21 +56,22 @@ Run `make eval` to regenerate. Numbers below are from a committed run (see `eval
 
 | Metric | Value |
 |---|---|
-| Unanswerable recall | [FILL IN] |
-| Unanswerable precision | [FILL IN] |
-| False-premise detection rate | [FILL IN] |
-| Answerable verdict rate | [FILL IN] |
-| Citation match rate | [FILL IN] |
-| Mean cost per query | [FILL IN] |
-| p95 latency | [FILL IN] |
+| Unanswerable recall | 0.75 (15/20) |
+| Unanswerable precision | 0.833 |
+| False-premise detection rate | 0.70 (7/10) |
+| Answerable verdict rate | 0.84 (21/25) |
+| Citation match rate | 0.762 |
+| Mean cost per query (USD) | $0.00091 |
+| p95 latency (s) | 4.87s |
+| Mean latency (s) | 2.63s |
 
 Full per-question results: `eval/results.json`.
 
 ## Cost & Latency Budget
 
 - Target: <= $0.02 average cost/query, p95 latency <= 8s.
-- Actual: see `eval/metrics.json` after running `make eval`. Embeddings and
-  reranking are local (free). Only LLM generation hits the API.
+- Actual: $0.00091 mean cost/query (well under budget — Groq + local embeddings/reranking).
+  p95 latency 4.87s (under 8s target). Only LLM generation hits the API.
 
 ## Project Structure
 
